@@ -1,0 +1,17 @@
+--- 
+- name: Update packages and store count in a file
+  hosts:
+    - windows
+  tasks : 
+   - name: Update packages for winodws 
+     win_shell: |
+       Install-WindowsUpdate -AcceptAll -IgnoreReboot |Tee-Object -FilePath "C:\ExampleFolder\NewFile.txt"
+     become: yes
+     become_method: runas
+     become_user: administrator
+     register: update 
+
+   - name : output
+     debug : 
+       var  : update 
+

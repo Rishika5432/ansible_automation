@@ -1,0 +1,38 @@
+---
+- name : update Windows server 
+  hosts : windows
+  tasks : 
+  -  name : update server 
+     ansible.windows.win_updates:
+      category_names: SecurityUpdates
+      state: installed
+      log_path: C:\ansible_wu.txt
+     register : win_update 
+
+
+  - name : update status 
+    debug : 
+       msg :  "update install {{ win_update.installed_update_count }}"
+
+  - name: Set fact for updated package count
+    set_fact : 
+      update_count : "{{ win_update.installed_update_count }}" 
+  
+  - name: Create output file
+    lineinfile: 
+      path: /root/windows_testing/windows.csv
+      line: "hostname, update_count "
+      create: yes
+    delegate_to: localhost
+    run_once: true
+
+  - name: Append count for each host to the output file
+    lineinfile:
+        path: /root/windows_testing/windows.csv
+        line: "{{ inventory_hostname }},{{ update_count }}"
+        create: yes
+        state: present
+    delegate_to: localhost
+
+
+
